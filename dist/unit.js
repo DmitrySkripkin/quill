@@ -3168,7 +3168,9 @@ var Selection = function () {
         }
       } else {
         selection.removeAllRanges();
-        this.root.blur();
+        try {
+          this.root.blur();
+        } catch (ignored) {} // only ie11
         document.body.focus(); // root.blur() not enough on IE11+Travis+SauceLabs (but not local VMs)
       }
     }
