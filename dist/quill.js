@@ -1466,10 +1466,7 @@ var Quill = function () {
     }
   }, {
     key: 'setSelection',
-    value: function setSelection(index, length) {
-      var reversed = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-      var source = arguments[3];
-
+    value: function setSelection(index, length, source) {
       if (index == null) {
         this.selection.setRange(null, length || Quill.sources.API);
       } else {
@@ -1481,7 +1478,8 @@ var Quill = function () {
         length = _overload16[1];
         source = _overload16[3];
 
-        this.selection.setRange(new _selection.Range(index, length, reversed), source);
+        var absLength = Math.abs(length);
+        this.selection.setRange(new _selection.Range(length < 0 ? index + absLength : index, absLength, length < 0), source);
         if (source !== _emitter4.default.sources.SILENT) {
           this.selection.scrollIntoView(this.scrollingContainer);
         }
@@ -2968,28 +2966,17 @@ var Selection = function () {
       }
     }
   }, {
-    key: 'isReversed',
-    value: function isReversed() {
-      var backwards = false;
-      if (window.getSelection) {
-        var sel = window.getSelection();
-        if (!sel.isCollapsed) {
-          var range = document.createRange();
-          range.setStart(sel.anchorNode, sel.anchorOffset);
-          range.setEnd(sel.focusNode, sel.focusOffset);
-          backwards = range.collapsed;
-          range.detach();
-        }
-      }
-      return backwards;
-    }
-  }, {
     key: 'getNativeRange',
     value: function getNativeRange() {
       var selection = document.getSelection();
       if (selection == null || selection.rangeCount <= 0) return null;
       var nativeRange = selection.getRangeAt(0);
       if (nativeRange == null) return null;
+      if (nativeRange.startContainer.isEqualNode(nativeRange.endContainer)) {
+        nativeRange.reversed = selection.anchorOffset === nativeRange.endOffset;
+      } else {
+        nativeRange.reversed = selection.anchorNode.isEqualNode(nativeRange.endContainer);
+      }
       var range = this.normalizeNative(nativeRange);
       debug.info('getNativeRange', range);
       return range;
@@ -3000,7 +2987,6 @@ var Selection = function () {
       var normalized = this.getNativeRange();
       if (normalized == null) return [null, null];
       var range = this.normalizedToRange(normalized);
-      range.reversed = this.isReversed();
       return [range, normalized];
     }
   }, {
@@ -3034,7 +3020,8 @@ var Selection = function () {
       });
       var end = Math.min(Math.max.apply(Math, _toConsumableArray(indexes)), this.scroll.length() - 1);
       var start = Math.min.apply(Math, [end].concat(_toConsumableArray(indexes)));
-      return new Range(start, end - start);
+      var reversed = range.native.reversed;
+      return new Range(start, end - start, reversed);
     }
   }, {
     key: 'normalizeNative',
@@ -3070,7 +3057,12 @@ var Selection = function () {
     value: function rangeToNative(range) {
       var _this5 = this;
 
-      var indexes = range.collapsed ? [range.index] : [range.index, range.index + range.length];
+      var indexes = [];
+      if (range.reversed) {
+        indexes = range.collapsed ? [range.index] : [range.index - range.length, range.index - 2 * range.length];
+      } else {
+        indexes = range.collapsed ? [range.index] : [range.index, range.index + range.length];
+      }
       var args = [];
       var scrollLength = this.scroll.length();
       indexes.forEach(function (index, i) {
@@ -3129,7 +3121,6 @@ var Selection = function () {
       var endNode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : startNode;
       var endOffset = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : startOffset;
       var force = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
-      var reversed = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
 
       debug.info('setNativeRange', startNode, startOffset, endNode, endOffset);
       if (startNode != null && (this.root.parentNode == null || startNode.parentNode == null || endNode.parentNode == null)) {
@@ -3150,15 +3141,23 @@ var Selection = function () {
             endOffset = [].indexOf.call(endNode.parentNode.childNodes, endNode);
             endNode = endNode.parentNode;
           }
+
+          var reversed = false;
+
+          if (startNode.isEqualNode(endNode) && startOffset > endOffset) {
+            reversed = true;
+          } else {
+            reversed = startNode.compareDocumentPosition(endNode) & Node.DOCUMENT_POSITION_FOLLOWING;
+          }
           var range = document.createRange();
           if (reversed) {
             range = document.createRange();
-            range.setStart(endNode, endOffset);
-            range.setEnd(endNode, endOffset);
+            range.setStart(startNode, startOffset);
+            range.setEnd(startNode, startOffset);
             selection.removeAllRanges();
             selection.addRange(range);
             var sel = window.getSelection();
-            sel.extend(startNode, startOffset);
+            sel.extend(endNode, endOffset);
           } else {
             range.setStart(startNode, startOffset);
             range.setEnd(endNode, endOffset);
@@ -3187,7 +3186,7 @@ var Selection = function () {
       debug.info('setRange', range);
       if (range != null) {
         var args = this.rangeToNative(range);
-        this.setNativeRange.apply(this, _toConsumableArray(args).concat([force, range.reversed]));
+        this.setNativeRange.apply(this, _toConsumableArray(args).concat([force]));
       } else {
         this.setNativeRange(null);
       }
@@ -8914,7 +8913,7 @@ function matchStyles(node, delta) {
   if (style.fontStyle && computeStyle(node).fontStyle === 'italic') {
     formats.italic = true;
   }
-  if (style.fontWeight && (computeStyle(node).fontWeight.startsWith('bold') || parseInt(computeStyle(node).fontWeight) >= 700)) {
+  if (['STRONG', 'B'].indexOf(node.tagName) !== -1 || style.fontWeight && (computeStyle(node).fontWeight.startsWith('bold') || parseInt(computeStyle(node).fontWeight) >= 700)) {
     formats.bold = true;
   }
   if (Object.keys(formats).length > 0) {
