@@ -8278,7 +8278,7 @@ function matchStyles(node, delta) {
   if (style.fontStyle && computeStyle(node).fontStyle === 'italic') {
     formats.italic = true;
   }
-  if (['STRONG', 'B'].indexOf(node.tagName) !== -1 || style.fontWeight && (computeStyle(node).fontWeight.startsWith('bold') || parseInt(computeStyle(node).fontWeight) >= 700)) {
+  if (style.fontWeight && (computeStyle(node).fontWeight.startsWith('bold') || parseInt(computeStyle(node).fontWeight) >= 600)) {
     formats.bold = true;
   }
   if (Object.keys(formats).length > 0) {
