@@ -311,7 +311,7 @@ function matchStyles(node, delta) {
     formats.italic = true;
   }
   if (style.fontWeight && (computeStyle(node).fontWeight.startsWith('bold') ||
-                           parseInt(computeStyle(node).fontWeight) >= 700)) {
+                           parseInt(computeStyle(node).fontWeight) >= 600)) {
     formats.bold = true;
   }
   if (Object.keys(formats).length > 0) {
