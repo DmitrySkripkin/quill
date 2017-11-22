@@ -237,7 +237,7 @@ class Selection {
   rangeToNative(range) {
     let indexes = [];
     if (range.reversed) {
-      indexes = range.collapsed ? [range.index] : [range.index - range.length, range.index - (2 * range.length)];
+      indexes = range.collapsed ? [range.index] : [range.index + range.length, range.index - range.length];
     } else {
       indexes = range.collapsed ? [range.index] : [range.index, range.index + range.length];
     }
@@ -310,8 +310,8 @@ class Selection {
         let range = document.createRange();
         if (reversed) {
           range = document.createRange();
-          range.setStart(startNode, startOffset);
-          range.setEnd(startNode, startOffset);
+          range.setStart(startNode, Math.max(0, startOffset));
+          range.setEnd(startNode, Math.max(0, startOffset));
           selection.removeAllRanges();
           selection.addRange(range);
           let sel = window.getSelection();
