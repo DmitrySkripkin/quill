@@ -10184,8 +10184,7 @@ var List = function (_Container) {
       }
     };
 
-    domNode.addEventListener('touchstart', listEventHandler);
-    domNode.addEventListener('mousedown', listEventHandler);
+    domNode.addEventListener('click', listEventHandler);
     return _this2;
   }
 
