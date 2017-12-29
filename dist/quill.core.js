@@ -7967,6 +7967,24 @@ var Clipboard = function (_Module) {
     _this.container = _this.quill.addContainer('ql-clipboard');
     _this.container.setAttribute('contenteditable', true);
     _this.container.setAttribute('tabindex', -1);
+
+    _this.container.addEventListener('focus', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (this.scrollTop) {
+        this.quill.scrollingContainer.scrollTop = this.scrollTop;
+      }
+      return false;
+    });
+    _this.container.addEventListener('scroll', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (this.scrollTop) {
+        this.quill.scrollingContainer.scrollTop = this.scrollTop;
+      }
+      return false;
+    });
+
     _this.matchers = [];
     CLIPBOARD_CONFIG.concat(_this.options.matchers).forEach(function (_ref) {
       var _ref2 = _slicedToArray(_ref, 2),

@@ -61,6 +61,24 @@ class Clipboard extends Module {
     this.container = this.quill.addContainer('ql-clipboard');
     this.container.setAttribute('contenteditable', true);
     this.container.setAttribute('tabindex', -1);
+
+    this.container.addEventListener('focus', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (this.scrollTop) {
+        this.quill.scrollingContainer.scrollTop = this.scrollTop;
+      }
+      return false;
+    });
+    this.container.addEventListener('scroll', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (this.scrollTop) {
+        this.quill.scrollingContainer.scrollTop = this.scrollTop;
+      }
+      return false;
+    });
+
     this.matchers = [];
     CLIPBOARD_CONFIG.concat(this.options.matchers).forEach(([selector, matcher]) => {
       if (!options.matchVisual && matcher === matchSpacing) return;
