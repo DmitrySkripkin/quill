@@ -8686,7 +8686,7 @@ var Clipboard = function (_Module) {
       var range = this.quill.getSelection();
       var delta = new _quillDelta2.default().retain(range.index);
       var scrollTop = this.quill.scrollingContainer.scrollTop;
-      this.container.focus();
+      // this.container.focus();
       this.quill.selection.update(_quill2.default.sources.SILENT);
       setTimeout(function () {
         delta = delta.concat(_this2.convert()).delete(range.length);
@@ -8695,7 +8695,7 @@ var Clipboard = function (_Module) {
         _this2.quill.setSelection(delta.length() - range.length, _quill2.default.sources.SILENT);
         _this2.quill.scrollingContainer.scrollTop = scrollTop;
         _this2.quill.focus();
-      }, 0);
+      }, 1);
     }
   }, {
     key: 'prepareMatching',

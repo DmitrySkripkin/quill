@@ -126,7 +126,7 @@ class Clipboard extends Module {
     let range = this.quill.getSelection();
     let delta = new Delta().retain(range.index);
     let scrollTop = this.quill.scrollingContainer.scrollTop;
-    this.container.focus();
+    // this.container.focus();
     this.quill.selection.update(Quill.sources.SILENT);
     setTimeout(() => {
       delta = delta.concat(this.convert()).delete(range.length);
@@ -135,7 +135,7 @@ class Clipboard extends Module {
       this.quill.setSelection(delta.length() - range.length, Quill.sources.SILENT);
       this.quill.scrollingContainer.scrollTop = scrollTop;
       this.quill.focus();
-    }, 0);
+    }, 1);
   }
 
   prepareMatching() {
