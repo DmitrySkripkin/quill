@@ -8606,16 +8606,16 @@ var Clipboard = function (_Module) {
     _this.container.addEventListener('focus', function (e) {
       e.preventDefault();
       e.stopPropagation();
-      if (this.scrollTop) {
-        this.quill.scrollingContainer.scrollTop = this.scrollTop;
+      if (_this.scrollTop) {
+        _this.quill.scrollingContainer.scrollTop = _this.scrollTop;
       }
       return false;
     });
     _this.container.addEventListener('scroll', function (e) {
       e.preventDefault();
       e.stopPropagation();
-      if (this.scrollTop) {
-        this.quill.scrollingContainer.scrollTop = this.scrollTop;
+      if (_this.scrollTop) {
+        _this.quill.scrollingContainer.scrollTop = _this.scrollTop;
       }
       return false;
     });

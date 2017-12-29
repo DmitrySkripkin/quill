@@ -62,7 +62,7 @@ class Clipboard extends Module {
     this.container.setAttribute('contenteditable', true);
     this.container.setAttribute('tabindex', -1);
 
-    this.container.addEventListener('focus', function (e) {
+    this.container.addEventListener('focus', (e) => {
       e.preventDefault();
       e.stopPropagation();
       if (this.scrollTop) {
@@ -70,7 +70,7 @@ class Clipboard extends Module {
       }
       return false;
     });
-    this.container.addEventListener('scroll', function (e) {
+    this.container.addEventListener('scroll', (e) => {
       e.preventDefault();
       e.stopPropagation();
       if (this.scrollTop) {
