@@ -8060,7 +8060,7 @@ var Clipboard = function (_Module) {
         _this2.quill.setSelection(delta.length() - range.length, _quill2.default.sources.SILENT);
         _this2.quill.scrollingContainer.scrollTop = scrollTop;
         _this2.quill.focus();
-      }, 1);
+      }, 0);
     }
   }, {
     key: 'prepareMatching',
