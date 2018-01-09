@@ -8686,7 +8686,7 @@ var Clipboard = function (_Module) {
       var range = this.quill.getSelection();
       var delta = new _quillDelta2.default().retain(range.index);
       var scrollTop = this.quill.scrollingContainer.scrollTop;
-      // this.container.focus();
+      this.container.focus();
       this.quill.selection.update(_quill2.default.sources.SILENT);
       setTimeout(function () {
         delta = delta.concat(_this2.convert()).delete(range.length);
@@ -11177,7 +11177,6 @@ var BubbleTooltip = function (_BaseTooltip) {
     _this2.quill.on(_emitter2.default.events.EDITOR_CHANGE, function (type, range, oldRange, source) {
       if (type !== _emitter2.default.events.SELECTION_CHANGE) return;
       if (range != null && range.length > 0 && source === _emitter2.default.sources.USER) {
-        _this2.show();
         // Lock our width so we will expand beyond our offsetParent boundaries
         _this2.root.style.left = '0px';
         _this2.root.style.width = '';
@@ -11192,6 +11191,7 @@ var BubbleTooltip = function (_BaseTooltip) {
           var _bounds = _this2.quill.getBounds(new _selection.Range(index, length));
           _this2.position(_bounds);
         }
+        _this2.show();
       } else if (document.activeElement !== _this2.textbox && _this2.quill.hasFocus()) {
         _this2.hide();
       }
