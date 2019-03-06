@@ -357,7 +357,7 @@ function matchText(node, delta) {
       return match.length < 1 && collapse ? ' ' : match;
     };
     text = text.replace(/\r\n/g, ' ').replace(/\n/g, ' ');
-    text = text.replace(/\s\s+/g, replacer.bind(replacer, true));  // collapse whitespace
+    // text = text.replace(/\s\s+/g, replacer.bind(replacer, true));  // collapse whitespace
     if ((node.previousSibling == null && isLine(node.parentNode)) ||
         (node.previousSibling != null && isLine(node.previousSibling))) {
       text = text.replace(/^\s+/, replacer.bind(replacer, false));
