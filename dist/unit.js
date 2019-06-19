@@ -2605,6 +2605,7 @@ var Editor = function () {
         while (Object.keys(formats).length > 0) {
           var blot = blots.shift();
           if (blot == null) return formats;
+          if (blot.isBlock && blot.isBlock()) return formats;
           formats = combineFormats((0, _block.bubbleFormats)(blot), formats);
         }
         return formats;

@@ -134,6 +134,7 @@ class Editor {
       while (Object.keys(formats).length > 0) {
         let blot = blots.shift();
         if (blot == null) return formats;
+        if (blot.isBlock && blot.isBlock()) return formats;
         formats = combineFormats(bubbleFormats(blot), formats);
       }
       return formats;
