@@ -2601,7 +2601,11 @@ var Editor = function () {
       }
       var formatsArr = [lines, leaves].map(function (blots) {
         if (blots.length === 0) return {};
-        var formats = (0, _block.bubbleFormats)(blots.shift());
+        var shifted = blots.shift();
+        while (shifted.isBlock && shifted.isBlock()) {
+          shifted = blots.shift();
+        }
+        var formats = (0, _block.bubbleFormats)(shifted);
         while (Object.keys(formats).length > 0) {
           var blot = blots.shift();
           if (blot == null) return formats;
