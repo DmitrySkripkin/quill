@@ -2602,7 +2602,7 @@ var Editor = function () {
       var formatsArr = [lines, leaves].map(function (blots) {
         if (blots.length === 0) return {};
         var shifted = blots.shift();
-        while (shifted.isBlock && shifted.isBlock()) {
+        while (shifted && shifted.isBlock && shifted.isBlock()) {
           shifted = blots.shift();
         }
         var formats = (0, _block.bubbleFormats)(shifted);

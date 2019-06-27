@@ -131,7 +131,7 @@ class Editor {
     let formatsArr = [lines, leaves].map(function(blots) {
       if (blots.length === 0) return {};
       let shifted = blots.shift();
-      while (shifted.isBlock && shifted.isBlock()) {
+      while (shifted && shifted.isBlock && shifted.isBlock()) {
         shifted = blots.shift();
       }
       let formats = bubbleFormats(shifted);
