@@ -66,6 +66,7 @@ class BubbleTooltip extends BaseTooltip {
           this.preview.setAttribute('href', preview);
           this.show();
           this.position(this.quill.getBounds(this.linkRange));
+          this.root.classList.add('ql-editing')
           return;
         }
       }
