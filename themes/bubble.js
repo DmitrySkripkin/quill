@@ -2,6 +2,7 @@ import extend from 'extend';
 import Emitter from '../core/emitter';
 import BaseTheme, { BaseTooltip } from './base';
 import { Range } from '../core/selection';
+import LinkBlot from '../formats/link';
 import icons from '../ui/icons';
 
 
@@ -31,10 +32,17 @@ BubbleTheme.DEFAULTS = extend(true, {}, BaseTheme.DEFAULTS, {
     toolbar: {
       handlers: {
         link: function(value) {
-          if (!value) {
-            this.quill.format('link', false);
+          if (value) {
+            let range = this.quill.getSelection();
+            if (range == null || range.length == 0) return;
+            let preview = this.quill.getText(range);
+            if (/^\S+@\S+\.\S+$/.test(preview) && preview.indexOf('mailto:') !== 0) {
+              preview = 'mailto:' + preview;
+            }
+            let tooltip = this.quill.theme.tooltip;
+            tooltip.edit('link', preview);
           } else {
-            this.quill.theme.tooltip.edit();
+            this.quill.format('link', false);
           }
         }
       }
@@ -46,8 +54,21 @@ BubbleTheme.DEFAULTS = extend(true, {}, BaseTheme.DEFAULTS, {
 class BubbleTooltip extends BaseTooltip {
   constructor(quill, bounds) {
     super(quill, bounds);
+    this.preview = this.root.querySelector('a.ql-preview');
     this.quill.on(Emitter.events.EDITOR_CHANGE, (type, range, oldRange, source) => {
       if (type !== Emitter.events.SELECTION_CHANGE) return;
+      if (range != null) {
+        let [link, offset] = this.quill.scroll.descendant(LinkBlot, range.index);
+        if (link != null) {
+          this.linkRange = new Range(range.index - offset, link.length());
+          let preview = LinkBlot.formats(link.domNode);
+          this.preview.textContent = preview;
+          this.preview.setAttribute('href', preview);
+          this.show();
+          this.position(this.quill.getBounds(this.linkRange));
+          return;
+        }
+      }
       if (range != null && range.length > 0 && source === Emitter.sources.USER) {
         this.show();
         // Lock our width so we will expand beyond our offsetParent boundaries
@@ -72,9 +93,6 @@ class BubbleTooltip extends BaseTooltip {
 
   listen() {
     super.listen();
-    this.root.querySelector('.ql-close').addEventListener('click', () => {
-      this.root.classList.remove('ql-editing');
-    });
     this.quill.on(Emitter.events.SCROLL_OPTIMIZE, () => {
       // Let selection be restored by toolbar handlers before repositioning
       setTimeout(() => {
@@ -85,6 +103,24 @@ class BubbleTooltip extends BaseTooltip {
         }
       }, 1);
     });
+    this.root.querySelector('a.ql-action').addEventListener('click', (event) => {
+      if (this.root.classList.contains('ql-editing')) {
+        this.save();
+      } else {
+        this.edit('link', this.preview.textContent);
+      }
+      event.preventDefault();
+    });
+    this.root.querySelector('a.ql-remove').addEventListener('click', (event) => {
+      if (this.linkRange != null) {
+        let range = this.linkRange;
+        this.restoreFocus();
+        this.quill.formatText(range, 'link', false, Emitter.sources.USER);
+        delete this.linkRange;
+      }
+      event.preventDefault();
+      this.hide();
+    });
   }
 
   cancel() {
@@ -93,17 +129,18 @@ class BubbleTooltip extends BaseTooltip {
 
   position(reference) {
     let shift = super.position(reference);
-    let arrow = this.root.querySelector('.ql-tooltip-arrow');
-    arrow.style.marginLeft = '';
+    // let arrow = this.root.querySelector('.ql-tooltip-arrow');
+    // arrow.style.marginLeft = '';
     if (shift === 0) return shift;
-    arrow.style.marginLeft = (-1*shift - arrow.offsetWidth/2) + 'px';
+    // arrow.style.marginLeft = (-1*shift - arrow.offsetWidth/2) + 'px';
   }
 }
 BubbleTooltip.TEMPLATE = [
-  '<span class="ql-tooltip-arrow"></span>',
-  '<div class="ql-tooltip-editor">',
-    '<input type="text" data-formula="e=mc^2" data-link="https://quilljs.com" data-video="Embed URL">',
-    '<a class="ql-close"></a>',
+  '<div class="ql-link-tooltip">',
+  '<a class="ql-preview" target="_blank" href="about:blank"></a>',
+  '<input type="text" data-formula="e=mc^2" data-link="https://quilljs.com" data-video="Embed URL">',
+  '<a class="ql-action"></a>',
+  '<a class="ql-remove"></a>',
   '</div>'
 ].join('');
 

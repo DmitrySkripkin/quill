@@ -1,10 +1,19 @@
 arrowWidth = 6px
+tooltipMargin = 8px
 
 .ql-bubble
   .ql-tooltip
     background-color: backgroundColor
     border-radius: 25px
     color: textColor
+    .ql-link-tooltip
+      display: none;
+    a.ql-preview
+      display: inline-block
+      max-width: 200px
+      overflow-x: hidden
+      text-overflow: ellipsis
+      vertical-align: top
   .ql-tooltip-arrow
     border-left: arrowWidth solid transparent
     border-right: arrowWidth solid transparent
@@ -19,14 +28,28 @@ arrowWidth = 6px
   .ql-tooltip.ql-flip .ql-tooltip-arrow
     border-top: arrowWidth solid backgroundColor
     bottom: -1 * arrowWidth
-
+  a.ql-action::after
+    border-right: 1px solid borderColor
+    content: 'Edit'
+    margin-left: tooltipMargin*2
+    padding-right: tooltipMargin
+  a.ql-remove::before
+    content: 'Remove'
+    margin-left: tooltipMargin
+      
   .ql-tooltip.ql-editing
     .ql-tooltip-editor
       display: block
     .ql-formats
       visibility: hidden
-
-  .ql-tooltip-editor
+    .ql-link-tooltip
+      display: block;
+    a.ql-action::after
+      border-right: 0px
+      content: 'Save'
+      padding-right: 0px
+    
+  .ql-tooltip-editors
     display: none
     input[type=text]
       background: transparent
@@ -38,6 +61,12 @@ arrowWidth = 6px
       padding: 10px 20px
       position: absolute
       width: 100%
+    a.ql-preview
+      display: inline-block
+      max-width: 200px
+      overflow-x: hidden
+      text-overflow: ellipsis
+      vertical-align: top
     a
       &:before
         color: inactiveColor
