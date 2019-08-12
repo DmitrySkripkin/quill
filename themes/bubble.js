@@ -54,7 +54,7 @@ BubbleTheme.DEFAULTS = extend(true, {}, BaseTheme.DEFAULTS, {
 class BubbleTooltip extends BaseTooltip {
   constructor(quill, bounds) {
     super(quill, bounds);
-    this.preview = this.root.querySelector('a.ql-preview');
+    this.input = this.root.querySelector('input');
     this.quill.on(Emitter.events.EDITOR_CHANGE, (type, range, oldRange, source) => {
       if (type !== Emitter.events.SELECTION_CHANGE) return;
       if (range != null) {
@@ -62,8 +62,8 @@ class BubbleTooltip extends BaseTooltip {
         if (link != null) {
           this.linkRange = new Range(range.index - offset, link.length());
           let preview = LinkBlot.formats(link.domNode);
-          this.preview.textContent = preview;
-          this.preview.setAttribute('href', preview);
+          this.input.value = preview;
+          // this.preview.setAttribute('href', preview);
           this.show();
           this.position(this.quill.getBounds(this.linkRange));
           this.root.classList.add('ql-editing')
@@ -108,7 +108,7 @@ class BubbleTooltip extends BaseTooltip {
       if (this.root.classList.contains('ql-editing')) {
         this.save();
       } else {
-        this.edit('link', this.preview.textContent);
+        this.edit('link', this.input.value);
       }
       event.preventDefault();
     });
@@ -138,7 +138,6 @@ class BubbleTooltip extends BaseTooltip {
 }
 BubbleTooltip.TEMPLATE = [
   '<div class="ql-link-tooltip">',
-  '<a class="ql-preview" target="_blank" href="about:blank"></a>',
   '<input type="text" data-formula="e=mc^2" data-link="https://quilljs.com" data-video="Embed URL">',
   '<a class="ql-action"></a>',
   '<a class="ql-remove"></a>',

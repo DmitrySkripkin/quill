@@ -38,12 +38,13 @@ tooltipMargin = 8px
     margin-left: tooltipMargin
       
   .ql-tooltip.ql-editing
+    width: auto!important
     .ql-tooltip-editor
       display: block
-    .ql-formats
-      visibility: hidden
+    .ql-toolbar
+      display: none
     .ql-link-tooltip
-      display: block;
+      display: flex;
     a.ql-action::after
       border-right: 0px
       content: 'Save'
