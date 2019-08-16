@@ -85,11 +85,11 @@ class Quill {
     this.clipboard = this.theme.addModule('clipboard');
     this.history = this.theme.addModule('history');
     this.theme.init();
-    this.emitter.on(Emitter.events.EDITOR_CHANGE, (type) => {
-      if (type === Emitter.events.TEXT_CHANGE) {
-        this.root.classList.toggle('ql-blank', this.editor.isBlank());
-      }
-    });
+    // this.emitter.on(Emitter.events.EDITOR_CHANGE, (type) => {
+    //   if (type === Emitter.events.TEXT_CHANGE) {
+    //     this.root.classList.toggle('ql-blank', this.editor.isBlank());
+    //   }
+    // });
     this.emitter.on(Emitter.events.SCROLL_UPDATE, (source, mutations) => {
       let range = this.selection.lastRange;
       let index = range && range.length === 0 ? range.index : undefined;

@@ -1140,11 +1140,11 @@ var Quill = function () {
     this.clipboard = this.theme.addModule('clipboard');
     this.history = this.theme.addModule('history');
     this.theme.init();
-    this.emitter.on(_emitter4.default.events.EDITOR_CHANGE, function (type) {
-      if (type === _emitter4.default.events.TEXT_CHANGE) {
-        _this2.root.classList.toggle('ql-blank', _this2.editor.isBlank());
-      }
-    });
+    // this.emitter.on(Emitter.events.EDITOR_CHANGE, (type) => {
+    //   if (type === Emitter.events.TEXT_CHANGE) {
+    //     this.root.classList.toggle('ql-blank', this.editor.isBlank());
+    //   }
+    // });
     this.emitter.on(_emitter4.default.events.SCROLL_UPDATE, function (source, mutations) {
       var range = _this2.selection.lastRange;
       var index = range && range.length === 0 ? range.index : undefined;
