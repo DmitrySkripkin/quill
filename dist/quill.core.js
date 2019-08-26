@@ -1509,7 +1509,8 @@ var Quill = function () {
         length = _overload16[1];
         source = _overload16[3];
 
-        this.selection.setRange(new _selection.Range(index, length), source);
+        var absLength = Math.abs(length);
+        this.selection.setRange(new _selection.Range(length < 0 ? index + absLength : index, absLength, length < 0), source);
         if (source !== _emitter4.default.sources.SILENT) {
           this.selection.scrollIntoView(this.scrollingContainer);
         }
@@ -2805,11 +2806,13 @@ var debug = (0, _logger2.default)('quill:selection');
 
 var Range = function Range(index) {
   var length = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var reversed = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
   _classCallCheck(this, Range);
 
   this.index = index;
   this.length = length;
+  this.reversed = reversed;
 };
 
 var Selection = function () {
@@ -3005,6 +3008,11 @@ var Selection = function () {
       if (selection == null || selection.rangeCount <= 0) return null;
       var nativeRange = selection.getRangeAt(0);
       if (nativeRange == null) return null;
+      if (nativeRange.startContainer.isEqualNode(nativeRange.endContainer)) {
+        nativeRange.reversed = selection.anchorOffset > nativeRange.endOffset;
+      } else {
+        nativeRange.reversed = selection.anchorNode.isEqualNode(nativeRange.endContainer);
+      }
       var range = this.normalizeNative(nativeRange);
       debug.info('getNativeRange', range);
       return range;
@@ -3048,7 +3056,8 @@ var Selection = function () {
       });
       var end = Math.min(Math.max.apply(Math, _toConsumableArray(indexes)), this.scroll.length() - 1);
       var start = Math.min.apply(Math, [end].concat(_toConsumableArray(indexes)));
-      return new Range(start, end - start);
+      var reversed = range.native.reversed;
+      return new Range(start, end - start, reversed);
     }
   }, {
     key: 'normalizeNative',
@@ -3084,7 +3093,12 @@ var Selection = function () {
     value: function rangeToNative(range) {
       var _this5 = this;
 
-      var indexes = range.collapsed ? [range.index] : [range.index, range.index + range.length];
+      var indexes = [];
+      if (range.reversed) {
+        indexes = range.collapsed ? [range.index] : [range.index - range.length, range.index - 2 * range.length];
+      } else {
+        indexes = range.collapsed ? [range.index] : [range.index, range.index + range.length];
+      }
       var args = [];
       var scrollLength = this.scroll.length();
       indexes.forEach(function (index, i) {
@@ -3163,11 +3177,29 @@ var Selection = function () {
             endOffset = [].indexOf.call(endNode.parentNode.childNodes, endNode);
             endNode = endNode.parentNode;
           }
+
+          var reversed = false;
+
+          if (startNode.isEqualNode(endNode) && startOffset > endOffset) {
+            reversed = true;
+          } else if (startOffset !== endOffset) {
+            reversed = startNode.compareDocumentPosition(endNode) & Node.DOCUMENT_POSITION_FOLLOWING;
+          }
           var range = document.createRange();
-          range.setStart(startNode, startOffset);
-          range.setEnd(endNode, endOffset);
-          selection.removeAllRanges();
-          selection.addRange(range);
+          if (reversed) {
+            range = document.createRange();
+            range.setStart(startNode, startOffset);
+            range.setEnd(startNode, startOffset);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            var sel = window.getSelection();
+            sel.extend(endNode, endOffset);
+          } else {
+            range.setStart(startNode, startOffset);
+            range.setEnd(endNode, endOffset);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
         }
       } else {
         selection.removeAllRanges();

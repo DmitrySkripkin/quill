@@ -1509,7 +1509,8 @@ var Quill = function () {
         length = _overload16[1];
         source = _overload16[3];
 
-        this.selection.setRange(new _selection.Range(index, length), source);
+        var absLength = Math.abs(length);
+        this.selection.setRange(new _selection.Range(length < 0 ? index + absLength : index, absLength, length < 0), source);
         if (source !== _emitter4.default.sources.SILENT) {
           this.selection.scrollIntoView(this.scrollingContainer);
         }
@@ -2805,11 +2806,13 @@ var debug = (0, _logger2.default)('quill:selection');
 
 var Range = function Range(index) {
   var length = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var reversed = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
   _classCallCheck(this, Range);
 
   this.index = index;
   this.length = length;
+  this.reversed = reversed;
 };
 
 var Selection = function () {
@@ -3005,6 +3008,11 @@ var Selection = function () {
       if (selection == null || selection.rangeCount <= 0) return null;
       var nativeRange = selection.getRangeAt(0);
       if (nativeRange == null) return null;
+      if (nativeRange.startContainer.isEqualNode(nativeRange.endContainer)) {
+        nativeRange.reversed = selection.anchorOffset > nativeRange.endOffset;
+      } else {
+        nativeRange.reversed = selection.anchorNode.isEqualNode(nativeRange.endContainer);
+      }
       var range = this.normalizeNative(nativeRange);
       debug.info('getNativeRange', range);
       return range;
@@ -3048,7 +3056,8 @@ var Selection = function () {
       });
       var end = Math.min(Math.max.apply(Math, _toConsumableArray(indexes)), this.scroll.length() - 1);
       var start = Math.min.apply(Math, [end].concat(_toConsumableArray(indexes)));
-      return new Range(start, end - start);
+      var reversed = range.native.reversed;
+      return new Range(start, end - start, reversed);
     }
   }, {
     key: 'normalizeNative',
@@ -3084,7 +3093,12 @@ var Selection = function () {
     value: function rangeToNative(range) {
       var _this5 = this;
 
-      var indexes = range.collapsed ? [range.index] : [range.index, range.index + range.length];
+      var indexes = [];
+      if (range.reversed) {
+        indexes = range.collapsed ? [range.index] : [range.index - range.length, range.index - 2 * range.length];
+      } else {
+        indexes = range.collapsed ? [range.index] : [range.index, range.index + range.length];
+      }
       var args = [];
       var scrollLength = this.scroll.length();
       indexes.forEach(function (index, i) {
@@ -3163,11 +3177,29 @@ var Selection = function () {
             endOffset = [].indexOf.call(endNode.parentNode.childNodes, endNode);
             endNode = endNode.parentNode;
           }
+
+          var reversed = false;
+
+          if (startNode.isEqualNode(endNode) && startOffset > endOffset) {
+            reversed = true;
+          } else if (startOffset !== endOffset) {
+            reversed = startNode.compareDocumentPosition(endNode) & Node.DOCUMENT_POSITION_FOLLOWING;
+          }
           var range = document.createRange();
-          range.setStart(startNode, startOffset);
-          range.setEnd(endNode, endOffset);
-          selection.removeAllRanges();
-          selection.addRange(range);
+          if (reversed) {
+            range = document.createRange();
+            range.setStart(startNode, startOffset);
+            range.setEnd(startNode, startOffset);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            var sel = window.getSelection();
+            sel.extend(endNode, endOffset);
+          } else {
+            range.setStart(startNode, startOffset);
+            range.setEnd(endNode, endOffset);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
         }
       } else {
         selection.removeAllRanges();
@@ -12398,6 +12430,18 @@ describe('Selection', function () {
 
       expect(range).toEqual(null);
     });
+
+    it('reversed', function () {
+      var selection = this.initialize(_selection2.default, '<p>0123</p>');
+      selection.setNativeRange(this.container.firstChild.firstChild, 2, this.container.firstChild.firstChild, 0);
+
+      var _selection$getRange21 = selection.getRange(),
+          _selection$getRange22 = _slicedToArray(_selection$getRange21, 1),
+          range = _selection$getRange22[0];
+
+      expect(range.index).toEqual(0);
+      expect(range.length).toEqual(2);
+    });
   });
 
   describe('setRange()', function () {
@@ -12406,9 +12450,9 @@ describe('Selection', function () {
       var expected = new _selection.Range(0);
       selection.setRange(expected);
 
-      var _selection$getRange21 = selection.getRange(),
-          _selection$getRange22 = _slicedToArray(_selection$getRange21, 1),
-          range = _selection$getRange22[0];
+      var _selection$getRange23 = selection.getRange(),
+          _selection$getRange24 = _slicedToArray(_selection$getRange23, 1),
+          range = _selection$getRange24[0];
 
       expect(range).toEqual(expected);
       expect(selection.hasFocus()).toBe(true);
@@ -12419,9 +12463,9 @@ describe('Selection', function () {
       var expected = new _selection.Range(0, 1);
       selection.setRange(expected);
 
-      var _selection$getRange23 = selection.getRange(),
-          _selection$getRange24 = _slicedToArray(_selection$getRange23, 1),
-          range = _selection$getRange24[0];
+      var _selection$getRange25 = selection.getRange(),
+          _selection$getRange26 = _slicedToArray(_selection$getRange25, 1),
+          range = _selection$getRange26[0];
 
       expect(range).toEqual(range);
       expect(selection.hasFocus()).toBe(true);
@@ -12432,9 +12476,9 @@ describe('Selection', function () {
       var expected = new _selection.Range(1, 3);
       selection.setRange(expected);
 
-      var _selection$getRange25 = selection.getRange(),
-          _selection$getRange26 = _slicedToArray(_selection$getRange25, 1),
-          range = _selection$getRange26[0];
+      var _selection$getRange27 = selection.getRange(),
+          _selection$getRange28 = _slicedToArray(_selection$getRange27, 1),
+          range = _selection$getRange28[0];
 
       expect(range).toEqual(expected);
       expect(selection.hasFocus()).toBe(true);
@@ -12445,9 +12489,9 @@ describe('Selection', function () {
       var expected = new _selection.Range(2, 2);
       selection.setRange(expected);
 
-      var _selection$getRange27 = selection.getRange(),
-          _selection$getRange28 = _slicedToArray(_selection$getRange27, 1),
-          range = _selection$getRange28[0];
+      var _selection$getRange29 = selection.getRange(),
+          _selection$getRange30 = _slicedToArray(_selection$getRange29, 1),
+          range = _selection$getRange30[0];
 
       expect(range).toEqual(expected);
       expect(selection.hasFocus()).toBe(true);
@@ -12458,9 +12502,9 @@ describe('Selection', function () {
       var expected = new _selection.Range(1, 0);
       selection.setRange(expected);
 
-      var _selection$getRange29 = selection.getRange(),
-          _selection$getRange30 = _slicedToArray(_selection$getRange29, 1),
-          range = _selection$getRange30[0];
+      var _selection$getRange31 = selection.getRange(),
+          _selection$getRange32 = _slicedToArray(_selection$getRange31, 1),
+          range = _selection$getRange32[0];
 
       expect(range).toEqual(expected);
       expect(selection.hasFocus()).toBe(true);
@@ -12471,9 +12515,9 @@ describe('Selection', function () {
       var expected = new _selection.Range(1, 3);
       selection.setRange(expected);
 
-      var _selection$getRange31 = selection.getRange(),
-          _selection$getRange32 = _slicedToArray(_selection$getRange31, 1),
-          range = _selection$getRange32[0];
+      var _selection$getRange33 = selection.getRange(),
+          _selection$getRange34 = _slicedToArray(_selection$getRange33, 1),
+          range = _selection$getRange34[0];
 
       expect(range).toEqual(expected);
       expect(selection.hasFocus()).toBe(true);
@@ -12483,18 +12527,18 @@ describe('Selection', function () {
       var selection = this.initialize(_selection2.default, '<p>0123</p>');
       selection.setRange(new _selection.Range(1));
 
-      var _selection$getRange33 = selection.getRange(),
-          _selection$getRange34 = _slicedToArray(_selection$getRange33, 1),
-          range = _selection$getRange34[0];
+      var _selection$getRange35 = selection.getRange(),
+          _selection$getRange36 = _slicedToArray(_selection$getRange35, 1),
+          range = _selection$getRange36[0];
 
       expect(range).not.toEqual(null);
       selection.setRange(null);
 
-      var _selection$getRange35 = selection.getRange();
+      var _selection$getRange37 = selection.getRange();
 
-      var _selection$getRange36 = _slicedToArray(_selection$getRange35, 1);
+      var _selection$getRange38 = _slicedToArray(_selection$getRange37, 1);
 
-      range = _selection$getRange36[0];
+      range = _selection$getRange38[0];
 
       expect(range).toEqual(null);
       expect(selection.hasFocus()).toBe(false);
