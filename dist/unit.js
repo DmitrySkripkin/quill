@@ -3009,7 +3009,7 @@ var Selection = function () {
       var nativeRange = selection.getRangeAt(0);
       if (nativeRange == null) return null;
       if (nativeRange.startContainer.isEqualNode(nativeRange.endContainer)) {
-        nativeRange.reversed = selection.anchorOffset > nativeRange.extentOffset;
+        nativeRange.reversed = selection.anchorOffset > selection.extentOffset;
       } else {
         nativeRange.reversed = selection.anchorNode.isEqualNode(nativeRange.endContainer);
       }
