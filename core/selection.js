@@ -163,7 +163,7 @@ class Selection {
     let nativeRange = selection.getRangeAt(0);
     if (nativeRange == null) return null;
     if (nativeRange.startContainer.isEqualNode(nativeRange.endContainer)) {
-      nativeRange.reversed =  selection.anchorOffset > nativeRange.endOffset;
+      nativeRange.reversed =  selection.anchorOffset > nativeRange.extentOffset;
     } else {
       nativeRange.reversed = selection.anchorNode.isEqualNode(nativeRange.endContainer);
     }
