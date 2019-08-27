@@ -299,29 +299,14 @@ class Selection {
           endOffset = [].indexOf.call(endNode.parentNode.childNodes, endNode);
           endNode = endNode.parentNode;
         }
-
-        let reversed = false;
-
-        if (startNode.isEqualNode(endNode) && startOffset > endOffset) {
-          reversed = true;
-        } else if (startOffset !== endOffset) {
-          reversed = startNode.compareDocumentPosition(endNode) & Node.DOCUMENT_POSITION_PRECEDING;
-        }
         let range = document.createRange();
-        if (reversed) {
-          range = document.createRange();
-          range.setStart(startNode, startOffset);
-          range.setEnd(startNode, startOffset);
-          selection.removeAllRanges();
-          selection.addRange(range);
-          let sel = window.getSelection();
-          sel.extend(endNode, endOffset);
-        } else {
-          range.setStart(startNode, startOffset);
-          range.setEnd(endNode, endOffset);
-          selection.removeAllRanges();
-          selection.addRange(range);
-        }
+        range = document.createRange();
+        range.setStart(startNode, startOffset);
+        range.setEnd(startNode, startOffset);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        let sel = window.getSelection();
+        sel.extend(endNode, endOffset);
       }
     } else {
       selection.removeAllRanges();
