@@ -3183,7 +3183,7 @@ var Selection = function () {
           if (startNode.isEqualNode(endNode) && startOffset > endOffset) {
             reversed = true;
           } else if (startOffset !== endOffset) {
-            reversed = startNode.compareDocumentPosition(endNode) & Node.DOCUMENT_POSITION_FOLLOWING;
+            reversed = startNode.compareDocumentPosition(endNode) & Node.DOCUMENT_POSITION_PRECEDING;
           }
           var range = document.createRange();
           if (reversed) {

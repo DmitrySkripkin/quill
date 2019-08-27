@@ -305,7 +305,7 @@ class Selection {
         if (startNode.isEqualNode(endNode) && startOffset > endOffset) {
           reversed = true;
         } else if (startOffset !== endOffset) {
-          reversed = startNode.compareDocumentPosition(endNode) & Node.DOCUMENT_POSITION_FOLLOWING;
+          reversed = startNode.compareDocumentPosition(endNode) & Node.DOCUMENT_POSITION_PRECEDING;
         }
         let range = document.createRange();
         if (reversed) {
