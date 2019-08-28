@@ -458,6 +458,11 @@ function modify(modifier, source, index, shift) {
 function overload(index, length, name, value, source) {
   let formats = {};
   if (typeof index.index === 'number' && typeof index.length === 'number') {
+    if (index.reversed) {
+      index.index += index.length;
+      index.length = -index.length;
+    }
+
     // Allow for throwaway end (used by insertText/insertEmbed)
     if (typeof length !== 'number') {
       source = value, value = name, name = length, length = index.length, index = index.index;
@@ -480,6 +485,7 @@ function overload(index, length, name, value, source) {
   }
   // Handle optional source
   source = source || Emitter.sources.API;
+
   return [index, length, formats, source];
 }
 
