@@ -319,9 +319,10 @@ class Quill {
     if (index == null) {
       this.selection.setRange(null, length || Quill.sources.API);
     } else {
+      const reversed = index.reversed;
       [index, length, , source] = overload(index, length, source);
       let absLength = Math.abs(length);
-      this.selection.setRange(new Range(length < 0 ? index + absLength : index, absLength, length < 0), source);
+      this.selection.setRange(new Range(index, absLength, reversed), source);
       if (source !== Emitter.sources.SILENT) {
         this.selection.scrollIntoView(this.scrollingContainer);
       }

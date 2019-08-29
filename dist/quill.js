@@ -1501,6 +1501,8 @@ var Quill = function () {
       if (index == null) {
         this.selection.setRange(null, length || Quill.sources.API);
       } else {
+        var reversed = index.reversed;
+
         var _overload15 = overload(index, length, source);
 
         var _overload16 = _slicedToArray(_overload15, 4);
@@ -1510,7 +1512,7 @@ var Quill = function () {
         source = _overload16[3];
 
         var absLength = Math.abs(length);
-        this.selection.setRange(new _selection.Range(length < 0 ? index + absLength : index, absLength, length < 0), source);
+        this.selection.setRange(new _selection.Range(index, absLength, reversed), source);
         if (source !== _emitter4.default.sources.SILENT) {
           this.selection.scrollIntoView(this.scrollingContainer);
         }
@@ -3101,7 +3103,7 @@ var Selection = function () {
 
       var indexes = [];
       if (range.reversed) {
-        indexes = range.collapsed ? [range.index] : [range.index - range.length, range.index - 2 * range.length];
+        indexes = [range.index, range.index - range.length];
       } else {
         indexes = range.collapsed ? [range.index] : [range.index, range.index + range.length];
       }

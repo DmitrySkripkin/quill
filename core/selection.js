@@ -237,7 +237,7 @@ class Selection {
   rangeToNative(range) {
     let indexes = [];
     if (range.reversed) {
-      indexes = range.collapsed ? [range.index] : [range.index - range.length, range.index - (2 * range.length)];
+      indexes = [range.index, range.index - range.length];
     } else {
       indexes = range.collapsed ? [range.index] : [range.index, range.index + range.length];
     }
