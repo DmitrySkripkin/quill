@@ -384,6 +384,7 @@ function handleDeleteRange(range) {
     let lastFormats = lines[lines.length - 1].formats();
     formats = DeltaOp.attributes.diff(lastFormats, firstFormats) || {};
   }
+  range.reversed = false;
   this.quill.deleteText(range, Quill.sources.USER);
   if (Object.keys(formats).length > 0) {
     this.quill.formatLine(range.index, 1, formats, Quill.sources.USER);

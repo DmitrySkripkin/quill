@@ -5923,6 +5923,7 @@ function handleDeleteRange(range) {
     var lastFormats = lines[lines.length - 1].formats();
     formats = _op2.default.attributes.diff(lastFormats, firstFormats) || {};
   }
+  range.reversed = false;
   this.quill.deleteText(range, _quill2.default.sources.USER);
   if (Object.keys(formats).length > 0) {
     this.quill.formatLine(range.index, 1, formats, _quill2.default.sources.USER);
