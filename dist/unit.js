@@ -3021,14 +3021,6 @@ var Selection = function () {
       } else {
         nativeRange.reversed = selection.anchorNode.compareDocumentPosition(selection.focusNode) === Node.DOCUMENT_POSITION_PRECEDING;
       }
-      if (nativeRange.reversed) {
-        var _temp = nativeRange.startOffset;
-        nativeRange.startOffset = nativeRange.endOffset;
-        nativeRange.endOffset = _temp;
-        _temp = nativeRange.startContainer;
-        nativeRange.startContainer = nativeRange.endContainer;
-        nativeRange.endContainer = _temp;
-      }
       var range = this.normalizeNative(nativeRange);
       debug.info('getNativeRange', range);
       return range;
@@ -3086,6 +3078,13 @@ var Selection = function () {
         end: { node: nativeRange.endContainer, offset: nativeRange.endOffset },
         native: nativeRange
       };
+      if (nativeRange.reversed) {
+        range = {
+          end: { node: nativeRange.startContainer, offset: nativeRange.startOffset },
+          start: { node: nativeRange.endContainer, offset: nativeRange.endOffset },
+          native: nativeRange
+        };
+      }
       [range.start, range.end].forEach(function (position) {
         var node = position.node,
             offset = position.offset;
