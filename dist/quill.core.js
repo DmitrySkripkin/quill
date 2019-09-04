@@ -3237,6 +3237,8 @@ var Selection = function () {
       if (this.lastRange != null) {
         this.savedRange = this.lastRange;
       }
+      // eslint-disable-next-line no-console
+      console.log(oldRange, this.lastRange);
       if (!(0, _deepEqual2.default)(oldRange, this.lastRange)) {
         var _emitter;
 

@@ -339,6 +339,8 @@ class Selection {
     if (this.lastRange != null) {
       this.savedRange = this.lastRange;
     }
+    // eslint-disable-next-line no-console
+    console.log(oldRange, this.lastRange);
     if (!equal(oldRange, this.lastRange)) {
       if (!this.composing && nativeRange != null && nativeRange.native.collapsed && nativeRange.start.node !== this.cursor.textNode) {
         this.cursor.restore();
