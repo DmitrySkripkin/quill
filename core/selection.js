@@ -165,7 +165,7 @@ class Selection {
     if (nativeRange.startContainer.isEqualNode(nativeRange.endContainer)) {
       nativeRange.reversed =  selection.anchorOffset > selection.extentOffset;
     } else {
-      nativeRange.reversed = selection.anchorNode.compareDocumentPosition(nativeRange.endContainer) === Node.DOCUMENT_POSITION_PRECEDING;
+      nativeRange.reversed = selection.anchorNode.compareDocumentPosition(selection.focusNode) === Node.DOCUMENT_POSITION_PRECEDING;
     }
     let range = this.normalizeNative(nativeRange);
     debug.info('getNativeRange', range);
