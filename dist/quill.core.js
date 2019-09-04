@@ -3019,7 +3019,7 @@ var Selection = function () {
       if (nativeRange.startContainer.isEqualNode(nativeRange.endContainer)) {
         nativeRange.reversed = selection.anchorOffset > selection.extentOffset;
       } else {
-        nativeRange.reversed = selection.anchorNode.isEqualNode(nativeRange.endContainer);
+        nativeRange.reversed = selection.anchorNode.compareDocumentPosition(nativeRange.endContainer === Node.DOCUMENT_POSITION_PRECEDING);
       }
       var range = this.normalizeNative(nativeRange);
       debug.info('getNativeRange', range);
@@ -3236,9 +3236,6 @@ var Selection = function () {
       this.lastRange = lastRange;
       if (this.lastRange != null) {
         this.savedRange = this.lastRange;
-      }
-      if (oldRange && this.lastRange && oldRange.reversed && oldRange.index === this.lastRange.index && oldRange.length === this.lastRange.length) {
-        this.lastRange.reversed = true;
       }
       if (!(0, _deepEqual2.default)(oldRange, this.lastRange)) {
         var _emitter;

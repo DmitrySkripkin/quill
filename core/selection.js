@@ -165,7 +165,7 @@ class Selection {
     if (nativeRange.startContainer.isEqualNode(nativeRange.endContainer)) {
       nativeRange.reversed =  selection.anchorOffset > selection.extentOffset;
     } else {
-      nativeRange.reversed = selection.anchorNode.isEqualNode(nativeRange.endContainer);
+      nativeRange.reversed = selection.anchorNode.compareDocumentPosition(nativeRange.endContainer === Node.DOCUMENT_POSITION_PRECEDING);
     }
     let range = this.normalizeNative(nativeRange);
     debug.info('getNativeRange', range);
@@ -338,9 +338,6 @@ class Selection {
     this.lastRange = lastRange;
     if (this.lastRange != null) {
       this.savedRange = this.lastRange;
-    }
-    if (oldRange && this.lastRange && oldRange.reversed && oldRange.index === this.lastRange.index && oldRange.length === this.lastRange.length){
-      this.lastRange.reversed = true;
     }
     if (!equal(oldRange, this.lastRange)) {
       if (!this.composing && nativeRange != null && nativeRange.native.collapsed && nativeRange.start.node !== this.cursor.textNode) {
