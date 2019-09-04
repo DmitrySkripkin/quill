@@ -339,7 +339,7 @@ class Selection {
     if (this.lastRange != null) {
       this.savedRange = this.lastRange;
     }
-    if (oldRange.reversed && oldRange.index === this.lastRange.index && oldRange.length === this.lastRange.length){
+    if (oldRange && this.lastRange && oldRange.reversed && oldRange.index === this.lastRange.index && oldRange.length === this.lastRange.length){
       this.lastRange.reversed = true;
     }
     if (!equal(oldRange, this.lastRange)) {
