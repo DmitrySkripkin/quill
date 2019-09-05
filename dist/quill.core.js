@@ -3195,7 +3195,7 @@ var Selection = function () {
           var range = document.createRange();
           range = document.createRange();
           range.setStart(startNode, startOffset);
-          range.setEnd(startNode, startOffset);
+          range.setEnd(endNode, endOffset);
           selection.removeAllRanges();
           selection.addRange(range);
           var sel = window.getSelection();
