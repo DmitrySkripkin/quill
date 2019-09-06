@@ -3192,16 +3192,8 @@ var Selection = function () {
             endOffset = [].indexOf.call(endNode.parentNode.childNodes, endNode);
             endNode = endNode.parentNode;
           }
-          var range = document.createRange();
-          range = document.createRange();
-          range.setStart(startNode, startOffset);
-          range.setEnd(startNode, startOffset);
-          selection.removeAllRanges();
-          selection.addRange(range);
           var sel = window.getSelection();
-          setTimeout(function () {
-            sel.extend(endNode, endOffset);
-          }, 0);
+          sel.setBaseAndExtent(startNode, startOffset, endNode, endOffset);
         }
       } else {
         selection.removeAllRanges();

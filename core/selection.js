@@ -306,16 +306,8 @@ class Selection {
           endOffset = [].indexOf.call(endNode.parentNode.childNodes, endNode);
           endNode = endNode.parentNode;
         }
-        let range = document.createRange();
-        range = document.createRange();
-        range.setStart(startNode, startOffset);
-        range.setEnd(startNode, startOffset);
-        selection.removeAllRanges();
-        selection.addRange(range);
         let sel = window.getSelection();
-        setTimeout(() => {
-          sel.extend(endNode, endOffset);
-        }, 0)
+        sel.setBaseAndExtent(startNode, startOffset, endNode, endOffset);
       }
     } else {
       selection.removeAllRanges();
