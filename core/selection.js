@@ -309,11 +309,13 @@ class Selection {
         let range = document.createRange();
         range = document.createRange();
         range.setStart(startNode, startOffset);
-        range.setEnd(endNode, endOffset);
+        range.setEnd(startNode, startOffset);
         selection.removeAllRanges();
         selection.addRange(range);
         let sel = window.getSelection();
-        sel.extend(endNode, endOffset);
+        setTimeout(() => {
+          sel.extend(endNode, endOffset);
+        }, 0)
       }
     } else {
       selection.removeAllRanges();

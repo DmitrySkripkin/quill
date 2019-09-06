@@ -3195,11 +3195,13 @@ var Selection = function () {
           var range = document.createRange();
           range = document.createRange();
           range.setStart(startNode, startOffset);
-          range.setEnd(endNode, endOffset);
+          range.setEnd(startNode, startOffset);
           selection.removeAllRanges();
           selection.addRange(range);
           var sel = window.getSelection();
-          sel.extend(endNode, endOffset);
+          setTimeout(function () {
+            sel.extend(endNode, endOffset);
+          }, 0);
         }
       } else {
         selection.removeAllRanges();
